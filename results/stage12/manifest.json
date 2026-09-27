@@ -96,7 +96,15 @@
   },
   {
    "result": "results/stage10/confirm/adaptive.json",
-   "status": "not yet produced"
+   "sha256": "b53170ed8019add2",
+   "stage": 10,
+   "role": "confirmatory",
+   "git_commit": "44c95a3bb092dfa47600f6c1c1f76b720c9a6f95",
+   "seed": 20260923,
+   "n_boot": 1000,
+   "code_fingerprint": "6ccb2dba95a32994",
+   "frozen_fingerprint_now": "6ccb2dba95a32994",
+   "frozen_code_unchanged": true
   },
   {
    "result": "results/stage10/dev/toxicity.json",
@@ -116,7 +124,11 @@
   },
   {
    "result": "results/stage12/final/final_oos.json",
-   "status": "not yet produced"
+   "sha256": "0624826e4b2d557a",
+   "stage": 12,
+   "git_commit": "44c95a3bb092dfa47600f6c1c1f76b720c9a6f95+dirty",
+   "seed": 20260924,
+   "code_fingerprint": "c185c46aae99a67c"
   }
  ],
  "datasets": [
@@ -238,11 +250,45 @@
   },
   {
    "db": "var/books_stage10.duckdb",
-   "status": "locked"
+   "counts": {
+    "events": 26,
+    "markets": 400,
+    "market_status_log": 658,
+    "trades": 192525,
+    "trade_sync": 402,
+    "series_meta": 14,
+    "book_snapshots": 346733,
+    "poll_log": 7066
+   },
+   "trades_time_range": [
+    "2026-03-10 15:28:12.555250",
+    "2026-09-20 13:42:08.371529"
+   ],
+   "markets_digest": "25430fcfe527954f724ae0efc00e4a2a",
+   "trades_digest": "a4d40abc04cf57ad7266f2dc98727d70",
+   "books_digest": "b86129925582b28c9aae6b5a6b78054c",
+   "fingerprint": "7cc6c0c574926a6a"
   },
   {
    "db": "var/books_stage12_us.duckdb",
-   "status": "absent"
+   "counts": {
+    "events": 38,
+    "markets": 400,
+    "market_status_log": 811,
+    "trades": 1453931,
+    "trade_sync": 400,
+    "series_meta": 11,
+    "book_snapshots": 1268860,
+    "poll_log": 6923
+   },
+   "trades_time_range": [
+    "2026-08-25 15:34:09.584006",
+    "2026-09-20 23:34:20.061679"
+   ],
+   "markets_digest": "4de9138e3b3cb234c267f738b9c09946",
+   "trades_digest": "22c022c9222ceabf0c7df36863098cbe",
+   "books_digest": "2c0d836a064b599982458c903493fce3",
+   "fingerprint": "de646afe354bdd7b"
   }
  ],
  "frozen_fingerprints_now": {

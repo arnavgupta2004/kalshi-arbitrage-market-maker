@@ -257,7 +257,7 @@ Contrasts between rungs (¢ per contract): staleness fair value over re-pricing 
 
 **Confirmatory status.** The hypotheses S1–S3 and T1–T8 were written from the development data and hold
 there by construction (11 of 11); only fresh data test them. Stage 10 confirmatory recording:
-(pending). Final out-of-sample recording: (pending).
+6 consistent, 1 inconclusive, 4 not consistent of 11. Final out-of-sample recording: arbitrage replication 10 of 15 hypotheses consistent; adaptive maker 8 of 11 consistent.
 
 **A correction that changed a conclusion.** The first version of this study said the staleness correction
 was worth ~1.4% skill and changed nothing. Both were wrong. The confirmatory recordings contain a 4.4 h
@@ -303,9 +303,9 @@ The pre-registered hypotheses, by experiment:
 | Stages 7-8 calibration (sealed holdout) | 17 of 17 | 0 | none |
 | Stage 9 baseline market maker (fresh recordings) | 8 of 8 | 0 | none |
 | Stage 10 adaptive maker (validation databases; by construction) | 11 of 11 | 0 | none |
-| Stage 10 adaptive maker (fresh recording) | (pending) |  |  |
-| Final out-of-sample: arbitrage replication | (pending) |  |  |
-| Final out-of-sample: baseline and adaptive maker | (pending) |  |  |
+| Stage 10 adaptive maker (fresh recording) | 6 of 11 | 1 | T2, T3, T5, T8 |
+| Final out-of-sample: arbitrage replication | 10 of 15 | 0 | A3, A6, C2, D1, D4 |
+| Final out-of-sample: baseline and adaptive maker | 8 of 11 | 0 | S2, T3, T4 |
 
 **Failed.**
 
@@ -340,7 +340,7 @@ the jump takes the price through a resting quote first.
    stretch goal), and nothing about other regimes is claimed.
 5. **Out-of-sample status.** The confirmatory Stage 10 recording and the final out-of-sample recording
    (`books_stage12_us`) are the last data no design decision has touched.
-   Stage 10 confirmatory: (pending). Final out-of-sample: (pending).
+   Stage 10 confirmatory: 6 consistent, 1 inconclusive, 4 not consistent of 11. Final out-of-sample: arbitrage replication 10 of 15 hypotheses consistent; adaptive maker 8 of 11 consistent.
 
 ## 10. The last two runs, pre-registered
 
@@ -364,9 +364,9 @@ events) are reported *inconclusive*, never counted as held.
 | Stages 7-8 calibration (sealed holdout) | 17 of 17 | 0 | none |
 | Stage 9 baseline market maker (fresh recordings) | 8 of 8 | 0 | none |
 | Stage 10 adaptive maker (validation databases; by construction) | 11 of 11 | 0 | none |
-| Stage 10 adaptive maker (fresh recording) | (pending) |  |  |
-| Final out-of-sample: arbitrage replication | (pending) |  |  |
-| Final out-of-sample: baseline and adaptive maker | (pending) |  |  |
+| Stage 10 adaptive maker (fresh recording) | 6 of 11 | 1 | T2, T3, T5, T8 |
+| Final out-of-sample: arbitrage replication | 10 of 15 | 0 | A3, A6, C2, D1, D4 |
+| Final out-of-sample: baseline and adaptive maker | 8 of 11 | 0 | S2, T3, T4 |
 
 ## 11. Reproducibility
 
