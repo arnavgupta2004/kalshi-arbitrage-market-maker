@@ -8,9 +8,8 @@ honest uncertainty, whether Kalshi's binary contracts are efficiently priced, wh
 no-arbitrage relations offer executable edge, whether prices are calibrated probabilities, and whether
 a market maker can earn a spread. **The answers are: mostly efficient, no executable edge, calibrated,
 and no.** Every number below is rendered from the result files the experiments wrote
-(`docs/research_report.tmpl.md` → `python -m scripts.stage12_report`); a figure marked *(pending)* is
-an experiment that had not finished when the report was rendered, and it fills itself in on the next
-render.
+(`docs/research_report.tmpl.md` → `python -m scripts.stage12_report`), so a number cannot drift from
+the analysis that produced it.
 
 ## 1. Summary
 
@@ -23,7 +22,7 @@ render.
 | **E** | Are prices calibrated? | Yes: on a sealed holdout of 1,776 instances (731 events), slope 0.97 [0.86, 1.11], calibration-in-the-large -0.012 [-0.038, 0.014]; recalibration does not help; 17 of 17 pre-registered criteria held. |
 | **F** | Does order-book information improve short-horizon estimates? | Not for the outcome probability (microprice is significantly *worse* than the mid: microprice minus mid = +0.0157 (681 instances)). At the market maker's horizon only a *staleness correction* transfers out of sample. See §6. |
 | **G** | How does time to resolution affect inventory risk? | Through the state, not the clock: the remaining risk of held inventory is flat across time-to-resolution ($2.17-$2.52), as the bounded-martingale argument predicts. |
-| **H** | Which information materially affects market making? | Only a staleness correction, worth 0.41 [0.10, 0.79]¢ per contract (a live-feed emulation); order-book, flow and momentum information is worth nothing detectable, volatility information cuts exposure not loss. Nothing makes a fill profitable (§6). |
+| **H** | Which information materially affects market making? | None robustly. On the development data a staleness correction (a live-feed emulation) was worth 0.41 [0.10, 0.79]¢ per contract, but it did **not** replicate on the final out-of-sample recording (-0.12 [-0.53, 0.31]¢); order-book, flow and momentum information is worth nothing detectable anywhere; volatility information changes exposure, not fill quality. Nothing makes a fill profitable (§6, §10). |
 
 **The market-making result, in one paragraph.** A baseline maker built for a bounded (0/1) claim loses
 money on fresh recordings (-$426 over 2,410 fills in 81 events; 30 s markout
@@ -256,8 +255,9 @@ Contrasts between rungs (¢ per contract): staleness fair value over re-pricing 
    its fills remain adversely selected.
 
 **Confirmatory status.** The hypotheses S1–S3 and T1–T8 were written from the development data and hold
-there by construction (11 of 11); only fresh data test them. Stage 10 confirmatory recording:
-6 consistent, 1 inconclusive, 4 not consistent of 11. Final out-of-sample recording: arbitrage replication 10 of 15 hypotheses consistent; adaptive maker 8 of 11 consistent.
+there by construction (11 of 11); only fresh data test them, and on fresh data the per-contract
+picture above did **not** hold up (§10): the staleness fair value's gain did not replicate, and the adaptive
+maker was no better per contract than the baseline on the larger of the two fresh recordings.
 
 **A correction that changed a conclusion.** The first version of this study said the staleness correction
 was worth ~1.4% skill and changed nothing. Both were wrong. The confirmatory recordings contain a 4.4 h
@@ -313,6 +313,10 @@ The pre-registered hypotheses, by experiment:
   beats the price; a market maker loses to informed flow.
 * **Four pre-registered arbitrage predictions** (A3, A4, C2, D1) did not hold; the market-making
   "time to resolution" prediction M6 held only by a 0.03¢ gap and is a null in substance.
+* **The one market-making improvement did not replicate.** The staleness fair value's +0.4¢ per
+  contract on the development data came out -0.12 [-0.53, 0.31]¢ on the final out-of-sample recording, and the
+  size rule, calibrated to leave average size unchanged, traded *more* on the sports recording rather
+  than less (§10).
 * **Several of my own errors**, found by the discipline above and fixed in the open: simultaneous events
   applied one at a time (a phantom +$983 arbitrage, Stage 5); a leaking event-size feature and a
   prequential fold that let siblings leak (Stage 7); trade-tape ties ordered arbitrarily (Stage 8,
@@ -339,12 +343,17 @@ the jump takes the price through a resting quote first.
 4. **One exchange, one product family, one period.** No cross-venue comparison was made (the optional
    stretch goal), and nothing about other regimes is claimed.
 5. **Out-of-sample status.** The confirmatory Stage 10 recording and the final out-of-sample recording
-   (`books_stage12_us`) are the last data no design decision has touched.
+   (`books_stage12_us`) were the last data no design decision had touched; both are now spent.
    Stage 10 confirmatory: 6 consistent, 1 inconclusive, 4 not consistent of 11. Final out-of-sample: arbitrage replication 10 of 15 hypotheses consistent; adaptive maker 8 of 11 consistent.
+6. **The final recording has outages too.** It spans 18.4 h of wall-clock but holds 5.8 h of observed
+   books in 29 pieces (the recording machine slept). The Stage 12 fixes cover this: samples need a recent
+   book, labels spanning an outage are dropped, the makers never quote on an unobserved book, and the
+   arbitrage scan excludes recording gaps from exposure. Wall-clock-based rates would be wrong; the ones
+   reported are not.
 
-## 10. The last two runs, pre-registered
+## 10. The last two runs
 
-Both were written before their data existed, and both run the code exactly as frozen.
+Both were pre-registered before their data existed, and both ran the code exactly as frozen.
 
 | run | data | frozen code | what is scored |
 |---|---|---|---|
@@ -357,6 +366,70 @@ rather than confirmed; the market maker and its adaptive variant remain unprofit
 adversely selected fills (T7); the staleness fair value again beats "the mid does not move" (S1) and
 sizing again cuts the loss by trading less (T3). Hypotheses that the data cannot support (too few
 events) are reported *inconclusive*, never counted as held.
+
+### 10.1 Results
+
+**Arbitrage replication** (168 confirmed episodes in 38 sports
+events). Standing violations were far *more* frequent than on the mixed recordings of §4:
+102.9 [74.0, 134.5] per 1,000 relation-hours, because live sports complements are where violations live.
+The conclusion did not change: funnel displayed 168 → liquid 148 → after fees 1 → after slippage 1 → executable 0; fee-free, 41 would have
+been executable. Fees remove the edge. Of the failed predictions, A3, C2 and D1 failed again, as in §4.
+A6 failed because a sports-only universe is almost all two-outcome complements, which are PROVEN
+relations. D4 failed narrowly: the most a fully hedged bundle earned at any latency was just above the
+$5 bound. A4 held vacuously, since there were no non-sports markets.
+
+**Stage 10 confirmatory** (20 settled events; sports, crypto strike ladders, golf).
+The adaptive maker came close to breakeven (-$161 → -$6), and per contract
+it was significantly better than the baseline (0.75 [0.23, 1.51]¢). That contradicted the pre-registered
+"no improvement" (T2, T3). It was also positive in 2 of 10 fill-model × latency cells
+(T8). But the staleness fair value, the one component that had helped in development, did nothing here
+(0.03 [-0.02, 0.14]¢). Book, flow and momentum added a small but significant +0.09¢ (T5), and most of the gain
+came from widening and sizing, on a thin recording dominated by crypto ladders.
+
+| variant (Stage 10 confirmatory recording) | net | contracts | settled P&L / contract (¢) | vs baseline (¢) |
+|---|---|---|---|---|
+| 0 baseline (Stage 9) | -$161 | 16,626 | -1.0 [-1.2, -0.5] | - |
+| 1 + re-price on prints (no model) | -$167 | 16,941 | -1.0 [-1.2, -0.5] | -0.02 [-0.05, 0.00] |
+| 2 + fair value: staleness correction | -$145 | 15,233 | -1.0 [-1.2, -0.3] | 0.01 [-0.05, 0.12] |
+| 3 + fair value: staleness + order book, flow, momentum | -$132 | 14,942 | -0.9 [-1.1, -0.3] | 0.09 [0.04, 0.18] |
+| 4 + widening by expected move | -$60 | 9,378 | -0.6 [-0.9, -0.2] | 0.33 [0.18, 0.48] |
+| 5 + size by expected move | -$6 | 2,794 | -0.2 [-0.7, 1.0] | 0.76 [0.14, 1.75] |
+| 6 + time-to-resolution skew (= FULL) | -$6 | 3,001 | -0.2 [-0.6, 0.6] | 0.75 [0.23, 1.51] |
+| full - fair value | -$14 | 3,323 | -0.4 [-0.9, 0.5] | 0.56 [-0.05, 1.31] |
+| full - widening | -$18 | 4,148 | -0.4 [-0.8, 0.3] | 0.53 [0.11, 1.06] |
+| full - size | -$81 | 10,070 | -0.8 [-1.0, -0.3] | 0.17 [0.06, 0.24] |
+| full - time skew | -$6 | 2,794 | -0.2 [-0.7, 1.0] | 0.76 [0.14, 1.75] |
+
+**Final out-of-sample** (38 settled sports events, the larger and cleaner of the two):
+none of it held up. The adaptive maker lost *more* than the baseline (-$314 →
+-$355) and was no better per contract (0.06 [-0.40, 0.50]¢). The staleness fair value was worth
+-0.12 [-0.53, 0.31]¢, even though its forecast skill replicated (7.0% [6.0, 8.2]): predicting the next
+tick of the mid did not translate into better fills. The size rule, calibrated on training data to
+leave the *average* size unchanged, traded more contracts here, not fewer (21,713 →
+25,650), in nearly three times as many, smaller fills. That is T3's failure: the
+calibration did not transfer to a sports-only universe.
+Both makers lost under every fill model and latency.
+
+| variant (final out-of-sample recording) | net | contracts | settled P&L / contract (¢) | vs baseline (¢) |
+|---|---|---|---|---|
+| 0 baseline (Stage 9) | -$314 | 21,713 | -1.4 [-1.9, -1.0] | - |
+| 1 + re-price on prints (no model) | -$315 | 21,746 | -1.4 [-1.8, -1.1] | 0.00 [-0.12, 0.11] |
+| 2 + fair value: staleness correction | -$329 | 21,051 | -1.6 [-1.9, -1.2] | -0.12 [-0.59, 0.37] |
+| 3 + fair value: staleness + order book, flow, momentum | -$372 | 21,005 | -1.8 [-2.1, -1.4] | -0.32 [-0.79, 0.10] |
+| 4 + widening by expected move | -$314 | 22,917 | -1.4 [-1.6, -1.1] | 0.08 [-0.29, 0.44] |
+| 5 + size by expected move | -$354 | 24,528 | -1.4 [-1.7, -1.2] | 0.00 [-0.50, 0.46] |
+| 6 + time-to-resolution skew (= FULL) | -$355 | 25,650 | -1.4 [-1.6, -1.2] | 0.06 [-0.40, 0.50] |
+| full - fair value | -$261 | 25,450 | -1.0 [-1.3, -0.7] | 0.42 [-0.02, 0.89] |
+| full - widening | -$298 | 23,851 | -1.2 [-1.4, -1.0] | 0.20 [-0.13, 0.54] |
+| full - size | -$309 | 22,690 | -1.4 [-1.5, -1.1] | 0.09 [-0.32, 0.48] |
+| full - time skew | -$354 | 24,528 | -1.4 [-1.7, -1.2] | 0.00 [-0.50, 0.46] |
+
+**Reading the two together.** The one robust result of the market-making study is the negative one: a
+passive maker on these books is adversely selected and loses money, with or without the adaptations.
+The Stage 10 adaptations moved the loss around from recording to recording (better on crypto ladders,
+worse on live sports), which is what a small, noisy effect looks like. That the staleness forecast kept
+its skill while its trading value vanished is the clearest lesson. A better forecast of the mid is not
+a better market maker: the fills that matter are the ones informed traders choose to take.
 
 | experiment | consistent | inconclusive | NOT consistent |
 |---|---|---|---|

@@ -220,27 +220,33 @@ the confirmatory recording was scored. All eleven hold on the validation data (`
 `hypotheses_on_validation`) — by construction, since they were written from it. That is **not**
 evidence; only fresh data tests them.
 
-## 9. Confirmatory status: not yet run
+## 9. Confirmatory and final out-of-sample results
 
-The fresh recording (`configs/books_stage10.yaml`, 6 h from 2026-09-20 07:40 UTC, ends ~13:40 UTC) was
-still running when this was written, and it is thin: after 1.2 h it held 26 events, 188 of its 400
-markets being one Bitcoin strike ladder and most of the rest golf-tour markets, with only a few live
-baseball games. Most claims would rest on fewer than 20 independent events and come out
-*inconclusive* under the sufficiency rule. A proper US-afternoon recording (`configs/books_stage12_us.yaml`)
-is the final out-of-sample evaluation of Stage 12.
+Both fresh recordings were scored once, with the code frozen at `6ccb2dba95a32994`. The full tables are in
+`docs/research_report.md` §10; the results are `results/stage10/confirm/adaptive.json` and
+`results/stage12/final/final_oos.json`.
 
-```bash
-python -m data.collectors.run refresh --config configs/refresh_stage10.yaml   # settlements + trade tape
-python -m scripts.stage10_adaptive_mm --role confirmatory --out results/stage10/confirm \
-    --expect-fingerprint 6ccb2dba95a32994
-python -m research.adaptive_hypotheses results/stage10/confirm/adaptive.json
-```
+| | Stage 10 confirmatory (`books_stage10`) | final out-of-sample (`books_stage12_us`) |
+|---|---|---|
+| data | 20 settled events; sports, crypto strike ladders, golf | 38 settled events; sports only; 5.8 h observed in an 18.4 h span |
+| baseline → FULL net | −$161 → −$6 | −$314 → −$355 |
+| FULL vs baseline, settled ¢/contract | +0.75 [0.23, 1.51] | +0.06 [−0.40, 0.50] |
+| staleness fair value (rung 2 vs 1) | +0.03 [−0.02, 0.14] | −0.12 [−0.53, 0.31] |
+| staleness forecast skill (S1) | 8.1% [2.7, 11.7] | 7.0% [6.0, 8.2] |
+| hypotheses | 6 consistent, 4 not (T2, T3, T5, T8), 1 inconclusive | 8 consistent, 3 not (S2, T3, T4) |
 
-**A disclosure.** To check that the confirmatory code path would not crash, I ran the pipeline once
-on a *copy of the partial recording* (1.2 h, 244 baseline fills) and looked at the output. No statistic
-from it was used to change any code, model, parameter or hypothesis (the later corrections concern the
-*training* data's outage, found from the training databases), but the smoke test should have been run on a
-development database. The confirmatory run will use the whole recording, which contains those hours.
+**What this means.** The staleness *forecast* replicated on both recordings: it predicts the next mid move.
+Its *trading* value did not replicate: +0.41¢ per contract in development, nothing on either fresh
+recording. The adaptive maker's gain on the thin confirmatory recording came from widening and sizing, not
+from the fair value, and it vanished on the larger sports recording. There the size rule traded more
+contracts, not fewer (21,713 → 25,650, in about 2.7× as many, smaller fills): its calibration did not
+transfer. The robust conclusion is the negative one:
+no adaptation tested here reliably improves what a filled quote is worth.
+
+**A disclosure.** To check that the confirmatory code path would not crash, I ran the pipeline once on a
+*copy of the partial Stage 10 recording* and looked at the output before the code was frozen. No statistic
+from it was used to change any code, model, parameter or hypothesis, but the smoke test should have been
+run on a development database.
 
 ## 10. Limitations
 

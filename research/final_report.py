@@ -44,6 +44,7 @@ FILES = {
     "s11a": "results/stage11/rest_adaptive/summary.json",
     "s11r": "results/stage11/rest_arbitrage/summary.json",
     "s12": "results/stage12/final/final_oos.json",
+    "s12arb": "results/stage12/final/stage6/arbitrage_research.json",
 }
 
 
@@ -603,6 +604,100 @@ def _(R):
 
 
 # ---- stage 12
+def _s12rows(R):
+    return R["s12"]["market_making"]["ladder"]["rows"]
+
+
+def _s10crows(R):
+    return _row(R, "s10c", "confirmatory")
+
+
+@claim("s10c_c21", "s10c")
+def _(R):
+    c = R["s10c"]["blocks"]["confirmatory"]["ladder"]["contrasts"]["2 vs 1"]
+    return ci(c["settled_cents_per_contract"], 2)
+
+
+@claim("s10c_events", "s10c")
+def _(R):
+    return str(_s10crows(R)[FULL10]["vs_baseline"]["settled_cents_per_contract"]["n_clusters"])
+
+
+@claim("s10c_positive_cells", "s10c")
+def _(R):
+    cells = R["s10c"]["blocks"]["confirmatory"]["fill_sensitivity"]
+    return f"{sum(c['full_net_usd'] >= 0 for c in cells)} of {len(cells)}"
+
+
+@claim("s12_base_net", "s12")
+def _(R):
+    return usd(_s12rows(R)[BASE10]["net_usd"])
+
+
+@claim("s12_full_net", "s12")
+def _(R):
+    return usd(_s12rows(R)[FULL10]["net_usd"])
+
+
+@claim("s12_base_contracts", "s12")
+def _(R):
+    return f"{_s12rows(R)[BASE10]['contracts']:,.0f}"
+
+
+@claim("s12_full_contracts", "s12")
+def _(R):
+    return f"{_s12rows(R)[FULL10]['contracts']:,.0f}"
+
+
+@claim("s12_pc_diff", "s12")
+def _(R):
+    return ci(_s12rows(R)[FULL10]["vs_baseline"]["settled_cents_per_contract"], 2)
+
+
+@claim("s12_c21", "s12")
+def _(R):
+    c = R["s12"]["market_making"]["ladder"]["contrasts"]["2 vs 1"]
+    return ci(c["settled_cents_per_contract"], 2)
+
+
+@claim("s12_events", "s12")
+def _(R):
+    return str(_s12rows(R)[FULL10]["vs_baseline"]["settled_cents_per_contract"]["n_clusters"])
+
+
+@claim("s12_stale_skill", "s12")
+def _(R):
+    s = R["s12"]["market_making"]["signal"]["fair_value_staleness"]
+    return f"{100 * s['skill_vs_zero']:.1f}% [{100 * s['lo']:.1f}, {100 * s['hi']:.1f}]"
+
+
+@claim("s12_arb_rate", "s12arb")
+def _(R):
+    return ci(R["s12arb"]["pooled"]["A_frequency"]["confirmed"]["per_1000_relation_hours"], 1)
+
+
+@claim("s12_arb_confirmed", "s12arb")
+def _(R):
+    return str(R["s12arb"]["pooled"]["counts"]["confirmed_at_or_above_min_level"])
+
+
+@claim("s12_arb_events", "s12arb")
+def _(R):
+    return str(R["s12arb"]["pooled"]["exposure"]["events"])
+
+
+@claim("s12_arb_funnel", "s12arb")
+def _(R):
+    st = R["s12arb"]["pooled"]["B_executability"]["confirmed"]["baseline"]["funnel"]["stages"]
+    return " → ".join(f"{s['stage'].replace('_', ' ')} {s['episodes']}" for s in st)
+
+
+@claim("s12_arb_fee_free", "s12arb")
+def _(R):
+    st = R["s12arb"]["pooled"]["B_executability"]["confirmed"]["fee_free"]["funnel"]["stages"]
+    return str(st[-1]["episodes"])
+
+
 @claim("s12_score", "s12")
 def _(R):
     return R["s12"]["headline"]
@@ -718,10 +813,9 @@ def _(R):
     )
 
 
-@table("ladder10c", "s10c")
-def _(R):
+def _ladder_md(rows_by_name: dict, label: str) -> str:
     rows = []
-    for name, v in _row(R, "s10c", "confirmatory").items():
+    for name, v in rows_by_name.items():
         vb = v.get("vs_baseline")
         rows.append(
             [
@@ -733,15 +827,19 @@ def _(R):
             ]
         )
     return _md(
-        [
-            "variant (confirmatory recording)",
-            "net",
-            "contracts",
-            "settled P&L / contract (¢)",
-            "vs baseline (¢)",
-        ],
+        [f"variant ({label})", "net", "contracts", "settled P&L / contract (¢)", "vs baseline (¢)"],
         rows,
     )
+
+
+@table("ladder10c", "s10c")
+def _(R):
+    return _ladder_md(_row(R, "s10c", "confirmatory"), "Stage 10 confirmatory recording")
+
+
+@table("ladder12", "s12")
+def _(R):
+    return _ladder_md(R["s12"]["market_making"]["ladder"]["rows"], "final out-of-sample recording")
 
 
 @table("scoreboard")

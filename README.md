@@ -7,7 +7,7 @@ calibration, execution and market making in **Kalshi binary prediction markets**
 > implemented is `GET`, the WebSocket client only sends `subscribe`, order-entry channels are
 > rejected, and there is no order code anywhere. Credentials live in a gitignored `.env`.
 
-Status: **all 12 stages built**; the two last out-of-sample runs are armed and pending (see the report).
+Status: **all 12 stages complete**, including the two final out-of-sample runs on fresh recordings.
 
 ## What this found
 
@@ -19,8 +19,8 @@ The framework's answers, with the numbers rendered from the result files in
   seconds, and 1 of 24 was executable at 100 contracts after fees (profit $0.14).
 * **Prices are calibrated**, and no model built from microstructure or an independent base rate beats them.
 * **A market maker loses**, under every fill model, latency and spread setting tried. The loss is adverse
-  selection, not fees. Information helps a little (a staleness correction, ~+0.4 cents per contract against a
-  ~3 cent loss); it does not make a fill profitable.
+  selection, not fees. A staleness correction looked worth ~+0.4 cents per contract on development data but did
+  not replicate out of sample; nothing makes a fill profitable.
 * **Paper trading matches the backtest exactly**: a live session's orders, fills and equity are identical to a
   backtest of its own tape.
 * **Nothing was found that a real trader could use**, and the report lists what failed, the errors found
@@ -200,8 +200,9 @@ fill quality by **+0.41¢ per contract [0.10, 0.79]** (about an eighth of the ba
 Sizing by expected volatility cuts the loss (-$317 to -$132 on validation) only by trading 67% fewer contracts, and
 widening is monotonically worse per contract. The adaptive maker still loses under every fill model and latency.
 A sampling flaw found in Stage 12 (trade prints inside a recording outage) had first hidden the staleness effect;
-it is corrected and documented. The confirmatory run on a fresh recording is pending (frozen fingerprint
-`6ccb2dba95a32994`). See [`docs/adaptive_market_maker.md`](docs/adaptive_market_maker.md).
+it is corrected and documented. **On fresh data the per-contract gains did not replicate**: the confirmatory
+recording (thin, 20 events) showed a gain from widening and sizing, the larger final sports recording showed none,
+and the staleness fair value helped on neither (frozen fingerprint `6ccb2dba95a32994`). See [`docs/adaptive_market_maker.md`](docs/adaptive_market_maker.md).
 
 ## Paper trading (Stage 11)
 
@@ -227,13 +228,13 @@ gaps, reconnects and malformed frames. Live P&L over minutes is noise and is not
 python -m scripts.stage12_report              # render docs/research_report.md from the result files
 python -m scripts.stage12_manifest --check    # every frozen fingerprint still matches its results
 python -m scripts.stage12_final_oos --db var/books_stage12_us.duckdb --out results/stage12/final \
-    --expect-fingerprint <frozen>              # the last out-of-sample run, ONCE
+    --expect-fingerprint c185c46aae99a67c      # the last out-of-sample run (already run once)
 ```
 
 The final report is generated from the results files (a number in it cannot drift from the analysis that
-produced it) and answers the spec's Experiments A-H in one place. Two runs on fresh data are armed: the Stage 10
+produced it) and answers the spec's Experiments A-H in one place. Two runs on fresh data were pre-registered: the Stage 10
 confirmatory recording and a US-afternoon sports recording (`configs/books_stage12_us.yaml`) evaluated once by
-everything frozen; the report fills them in when they exist. Writing the report found and fixed two things:
+everything frozen; both have run, and their results are in the report (§10). Writing the report found and fixed two things:
 the confirmatory recordings hold ~1.8 h of observed data, not the ~6 h their wall-clock suggested (a 4.4 h
 outage), and the Stage 10 signal study had sampled trade prints inside that outage, which had hidden a real
 (small) staleness effect. Stage 6's stored fingerprint cannot be reproduced from the committed tree, so its

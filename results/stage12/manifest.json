@@ -22,7 +22,7 @@
    "role": "confirmatory",
    "git_commit": "f9b052dc888fc1cd23d301933e452eace20838ca+dirty",
    "code_fingerprint": "663d74308d808b79",
-   "frozen_fingerprint_now": "717d9c633d774c7c",
+   "frozen_fingerprint_now": "5c1bde9c6a241620",
    "frozen_code_unchanged": null,
    "reproduced_by_rerun": true
   },
@@ -33,7 +33,7 @@
    "role": "development",
    "git_commit": "f9b052dc888fc1cd23d301933e452eace20838ca+dirty",
    "code_fingerprint": "663d74308d808b79",
-   "frozen_fingerprint_now": "717d9c633d774c7c",
+   "frozen_fingerprint_now": "5c1bde9c6a241620",
    "frozen_code_unchanged": null,
    "reproduced_by_rerun": true
   },
@@ -129,6 +129,17 @@
    "git_commit": "44c95a3bb092dfa47600f6c1c1f76b720c9a6f95+dirty",
    "seed": 20260924,
    "code_fingerprint": "c185c46aae99a67c"
+  },
+  {
+   "result": "results/stage12/final/stage6/arbitrage_research.json",
+   "sha256": "b681490eb0a085ba",
+   "stage": 6,
+   "role": "confirmatory",
+   "git_commit": "44c95a3bb092dfa47600f6c1c1f76b720c9a6f95+dirty",
+   "code_fingerprint": "717d9c633d774c7c",
+   "frozen_fingerprint_now": "5c1bde9c6a241620",
+   "frozen_code_unchanged": null,
+   "reproduced_by_rerun": true
   }
  ],
  "datasets": [
@@ -292,7 +303,7 @@
   }
  ],
  "frozen_fingerprints_now": {
-  "stage6": "717d9c633d774c7c",
+  "stage6": "5c1bde9c6a241620",
   "stage8": "9c7d30b39a17ea63",
   "stage9": "e036156024e9174a",
   "stage10": "6ccb2dba95a32994"
